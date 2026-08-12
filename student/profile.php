@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $studentId = clean($_POST['student_id'] ?? '');
         $birth = clean($_POST['birth_date'] ?? '');
         $gender = clean($_POST['gender'] ?? '');
+        $academicLevel = clean($_POST['academic_level'] ?? '');
         $school = clean($_POST['school'] ?? '');
         $course = clean($_POST['course'] ?? '');
         $yearLevel = clean($_POST['year_level'] ?? '');
@@ -52,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($gender !== '' && !in_array($gender, ['male', 'female', 'other'], true)) {
             $errors[] = 'Gender is invalid.';
         }
+        if (!in_array($academicLevel, ['SHS', 'College'], true)) {
+            $errors[] = 'Academic level is invalid.';
+        }
 
         if (empty($errors)) {
             // Duplicate student_id check
@@ -66,14 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare(
                 'UPDATE student_profiles SET
                     student_id = ?, first_name = ?, middle_name = ?, last_name = ?,
-                    birth_date = ?, gender = ?, school = ?, course = ?, year_level = ?,
+                    birth_date = ?, gender = ?, school = ?, course = ?, year_level = ?, academic_level = ?,
                     address = ?, city = ?, province = ?, contact_number = ?, gpa = ?, family_income = ?
                  WHERE id = ?'
             );
             $stmt->execute([
                 $studentId, $first, $middle, $last,
                 $birth !== '' ? $birth : null, $gender !== '' ? $gender : null,
-                $school, $course, $yearLevel,
+                $school, $course, $yearLevel, $academicLevel,
                 $address, $city, $province, $contact,
                 $gpa !== '' ? $gpa : null, $income !== '' ? $income : null,
                 $me['id'],
@@ -166,21 +170,29 @@ include BASE_PATH . '/includes/header.php';
                                             </select>
                                         </div>
                                         <div class="col-md-6">
+                                            <label class="form-label required">Academic Level</label>
+                                            <select class="form-select" id="academic_level" name="academic_level" required>
+                                                <option value="">Select</option>
+                                                <option value="SHS" <?php echo $me['academic_level'] === 'SHS' ? 'selected' : ''; ?>>Senior High School</option>
+                                                <option value="College" <?php echo $me['academic_level'] === 'College' ? 'selected' : ''; ?>>College</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label required">Year Level</label>
+                                            <select class="form-select" id="year_level" name="year_level" required>
+                                                <option value="">Select</option>
+                                                <?php foreach (['Grade 11', 'Grade 12', '1st Year', '2nd Year', '3rd Year', '4th Year'] as $y): ?>
+                                                    <option <?php echo $me['year_level'] === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label">School</label>
                                             <input type="text" class="form-control" name="school" value="<?php echo e($me['school']); ?>">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Course / Program</label>
-                                            <input type="text" class="form-control" name="course" value="<?php echo e($me['course']); ?>">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Year level</label>
-                                            <select class="form-select" name="year_level">
-                                                <option value="">Select</option>
-                                                <?php foreach (['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'] as $y): ?>
-                                                    <option <?php echo $me['year_level'] === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
+                                            <label class="form-label">Strand / Course / Program</label>
+                                            <input type="text" class="form-control" name="course" value="<?php echo e($me['course']); ?>" placeholder="e.g. STEM / BS Information Technology">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">GPA</label>
@@ -190,7 +202,7 @@ include BASE_PATH . '/includes/header.php';
                                             <label class="form-label">Family income (PHP)</label>
                                             <input type="text" class="form-control" name="family_income" value="<?php echo e($me['family_income']); ?>">
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label">Contact number</label>
                                             <input type="text" class="form-control" name="contact_number" value="<?php echo e($me['contact_number']); ?>">
                                         </div>

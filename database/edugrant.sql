@@ -278,16 +278,16 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `status`) VALUES
 -- =============================================================
 INSERT INTO `student_profiles`
 (`id`, `user_id`, `student_id`, `first_name`, `middle_name`, `last_name`,
- `birth_date`, `gender`, `school`, `course`, `year_level`,
+ `birth_date`, `gender`, `school`, `course`, `year_level`, `academic_level`,
  `address`, `city`, `province`, `contact_number`, `gpa`, `family_income`) VALUES
 (1, 2, '2024-0001', 'Juan', 'Santos', 'Dela Cruz',
- '2005-03-14', 'male', 'Metro University', 'BS Information Technology', '2nd Year',
+ '2005-03-14', 'male', 'Metro University', 'BS Information Technology', '2nd Year', 'College',
  '123 Rizal St.', 'Quezon City', 'Metro Manila', '09171234567', 1.75, 180000.00),
 (2, 3, '2024-0002', 'Maria', 'Garcia', 'Santos',
- '2004-11-02', 'female', 'Metro University', 'BS Computer Science', '3rd Year',
+ '2004-11-02', 'female', 'Metro University', 'BS Computer Science', '3rd Year', 'College',
  '456 Mabini St.', 'Manila', 'Metro Manila', '09189876543', 1.50, 150000.00),
 (3, 4, '2024-0003', 'Pedro', 'Lopez', 'Reyes',
- '2005-06-21', 'male', 'Provincial State College', 'BS Information Technology', '1st Year',
+ '2005-06-21', 'male', 'Provincial State College', 'BS Information Technology', '1st Year', 'College',
  '789 Luna St.', 'Cebu City', 'Cebu', '09222333444', 1.90, 210000.00);
 
 -- =============================================================

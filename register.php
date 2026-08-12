@@ -60,18 +60,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $userId = (int)$pdo->lastInsertId();
 
                 if ($role === 'student') {
-                    $studentId   = clean($_POST['student_id'] ?? '');
-                    $school      = clean($_POST['school'] ?? '');
-                    $course      = clean($_POST['course'] ?? '');
-                    $yearLevel   = clean($_POST['year_level'] ?? '');
-                    $contact     = clean($_POST['contact_number'] ?? '');
+                    $studentId     = clean($_POST['student_id'] ?? '');
+                    $academicLevel = clean($_POST['academic_level'] ?? '');
+                    $school        = clean($_POST['school'] ?? '');
+                    $course        = clean($_POST['course'] ?? '');
+                    $yearLevel     = clean($_POST['year_level'] ?? '');
+                    $contact       = clean($_POST['contact_number'] ?? '');
+
+                    if (!in_array($academicLevel, ['SHS', 'College'], true)) {
+                        throw new RuntimeException('Academic level is invalid.');
+                    }
 
                     $sp = $pdo->prepare(
                         'INSERT INTO student_profiles
-                         (user_id, student_id, first_name, last_name, school, course, year_level, contact_number)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                         (user_id, student_id, first_name, last_name, school, course, year_level, academic_level, contact_number)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
                     );
-                    $sp->execute([$userId, $studentId, $name, '', $school, $course, $yearLevel, $contact]);
+                    $sp->execute([$userId, $studentId, $name, '', $school, $course, $yearLevel, $academicLevel, $contact]);
                     createNotification($userId, 'Welcome to ' . APP_NAME,
                         'Explore the scholarship directory and start tracking your applications.', 'system');
                 } else {
@@ -177,12 +182,23 @@ include BASE_PATH . '/includes/header.php';
                                        value="<?php echo e($old['student_id'] ?? ''); ?>">
                             </div>
                             <div class="col-md-6">
-                                <label for="year_level" class="form-label">Year level</label>
+                                <label for="academic_level" class="form-label required">Academic Level</label>
+                                <select class="form-select" id="academic_level" name="academic_level">
+                                    <option value="">Select</option>
+                                    <option value="SHS" <?php echo ($old['academic_level'] ?? '') === 'SHS' ? 'selected' : ''; ?>>Senior High School</option>
+                                    <option value="College" <?php echo ($old['academic_level'] ?? '') === 'College' ? 'selected' : ''; ?>>College</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="year_level" class="form-label required">Year Level</label>
                                 <select class="form-select" id="year_level" name="year_level">
                                     <option value="">Select year level</option>
-                                    <?php foreach (['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'] as $y): ?>
-                                        <option <?php echo ($old['year_level'] ?? '') === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
-                                    <?php endforeach; ?>
+                                    <option value="Grade 11" <?php echo ($old['year_level'] ?? '') === 'Grade 11' ? 'selected' : ''; ?>>Grade 11</option>
+                                    <option value="Grade 12" <?php echo ($old['year_level'] ?? '') === 'Grade 12' ? 'selected' : ''; ?>>Grade 12</option>
+                                    <option value="1st Year" <?php echo ($old['year_level'] ?? '') === '1st Year' ? 'selected' : ''; ?>>1st Year</option>
+                                    <option value="2nd Year" <?php echo ($old['year_level'] ?? '') === '2nd Year' ? 'selected' : ''; ?>>2nd Year</option>
+                                    <option value="3rd Year" <?php echo ($old['year_level'] ?? '') === '3rd Year' ? 'selected' : ''; ?>>3rd Year</option>
+                                    <option value="4th Year" <?php echo ($old['year_level'] ?? '') === '4th Year' ? 'selected' : ''; ?>>4th Year</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
@@ -191,9 +207,9 @@ include BASE_PATH . '/includes/header.php';
                                        value="<?php echo e($old['school'] ?? ''); ?>">
                             </div>
                             <div class="col-md-6">
-                                <label for="course" class="form-label">Course / Program</label>
+                                <label for="course" class="form-label">Strand / Course / Program</label>
                                 <input type="text" class="form-control" id="course" name="course"
-                                       value="<?php echo e($old['course'] ?? ''); ?>">
+                                       value="<?php echo e($old['course'] ?? ''); ?>" placeholder="e.g. STEM / BS Information Technology">
                             </div>
                             <div class="col-md-6">
                                 <label for="contact_number" class="form-label">Contact number</label>
