@@ -78,6 +78,22 @@ function clean(string $value): string
 }
 
 /**
+ * Normalize a user-entered numeric value by stripping thousand separators,
+ * currency symbols, and whitespace. e.g. "250,000" -> "250000", "₱1.75" -> "1.75".
+ * Returns the cleaned string, or '' if the input is empty.
+ */
+function normalizeNumeric(string $value): string
+{
+    $value = trim($value);
+    if ($value === '') {
+        return '';
+    }
+    // Remove common currency symbols
+    $value = str_replace(['₱', 'PHP', 'php', 'P', ','], '', $value);
+    return trim($value);
+}
+
+/**
  * Validate a URL (allows empty). Returns false when invalid.
  */
 function validateUrl(?string $value): bool
@@ -273,7 +289,7 @@ function getUnreadNotifications(int $userId): array
     $stmt = $pdo->prepare(
         'SELECT id, title, message, type, is_read, created_at
          FROM notifications
-         WHERE user_id = ?
+         WHERE user_id = ? AND is_read = 0
          ORDER BY created_at DESC
          LIMIT 5'
     );

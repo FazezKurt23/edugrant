@@ -7,7 +7,7 @@
 
 // Base URL. Change this if EduGrant is not installed at
 // http://localhost/EduGrant/
-define('BASE_URL', 'http://localhost/EduGrant');
+define('BASE_URL', 'http://localhost/edugrant-111');
 
 // Absolute filesystem path to the project root
 define('BASE_PATH', __DIR__ . '/..');
@@ -40,4 +40,22 @@ if (session_status() === PHP_SESSION_NONE) {
         'secure' => false, // set to true if you use HTTPS
     ]);
     session_start();
+}
+
+// Server-side idle timeout: log out users inactive longer than SESSION_LIFETIME.
+if (isset($_SESSION['user_id'])) {
+    $lastActivity = $_SESSION['last_activity'] ?? time();
+    if ((time() - (int)$lastActivity) > SESSION_LIFETIME) {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        }
+        session_destroy();
+        session_start();
+        $_SESSION['flash_error'] = 'Your session expired due to inactivity. Please log in again.';
+    } else {
+        $_SESSION['last_activity'] = time();
+    }
 }

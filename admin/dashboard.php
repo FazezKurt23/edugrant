@@ -61,12 +61,13 @@ function chartJson(array $rows, string $labelKey, string $valueKey): string
         $labels[] = $r[$labelKey];
         $data[] = (int)$r[$valueKey];
     }
-    return json_encode(['labels' => $labels, 'data' => $data]);
+    return json_encode(['labels' => $labels, 'data' => $data], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 }
 
 $page_title = 'Admin Dashboard';
 $layout = 'dashboard';
 $page_active = 'dashboard';
+$loadChartJs = true;
 include BASE_PATH . '/includes/header.php';
 ?>
 
@@ -82,7 +83,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-blue-soft"><i class="bi bi-mortarboard text-primary"></i></div>
-                                <div><div class="stat-value"><?php echo $totalStudents; ?></div><div class="stat-label">Total Students</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $totalStudents; ?>"><?php echo $totalStudents; ?></div><div class="stat-label">Total Students</div></div>
                             </div>
                         </div>
                     </div>
@@ -90,7 +91,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-purple-soft"><i class="bi bi-buildings text-primary"></i></div>
-                                <div><div class="stat-value"><?php echo $totalProviders; ?></div><div class="stat-label">Total Providers</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $totalProviders; ?>"><?php echo $totalProviders; ?></div><div class="stat-label">Total Providers</div></div>
                             </div>
                         </div>
                     </div>
@@ -98,7 +99,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-green-soft"><i class="bi bi-collection text-success"></i></div>
-                                <div><div class="stat-value"><?php echo $totalScholars; ?></div><div class="stat-label">Total Scholarships</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $totalScholars; ?>"><?php echo $totalScholars; ?></div><div class="stat-label">Total Scholarships</div></div>
                             </div>
                         </div>
                     </div>
@@ -106,7 +107,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-orange-soft"><i class="bi bi-hourglass-split text-warning"></i></div>
-                                <div><div class="stat-value"><?php echo $pendingScholars; ?></div><div class="stat-label">Pending Scholarships</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $pendingScholars; ?>"><?php echo $pendingScholars; ?></div><div class="stat-label">Pending Scholarships</div></div>
                             </div>
                         </div>
                     </div>
@@ -114,7 +115,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-green-soft"><i class="bi bi-check-circle text-success"></i></div>
-                                <div><div class="stat-value"><?php echo $approvedScholars; ?></div><div class="stat-label">Approved</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $approvedScholars; ?>"><?php echo $approvedScholars; ?></div><div class="stat-label">Approved</div></div>
                             </div>
                         </div>
                     </div>
@@ -122,7 +123,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-blue-soft"><i class="bi bi-kanban text-primary"></i></div>
-                                <div><div class="stat-value"><?php echo $totalApps; ?></div><div class="stat-label">Total Applications</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $totalApps; ?>"><?php echo $totalApps; ?></div><div class="stat-label">Total Applications</div></div>
                             </div>
                         </div>
                     </div>
@@ -130,7 +131,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-red-soft"><i class="bi bi-alarm text-danger"></i></div>
-                                <div><div class="stat-value"><?php echo $upcomingDeadlines; ?></div><div class="stat-label">Upcoming Deadlines</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $upcomingDeadlines; ?>"><?php echo $upcomingDeadlines; ?></div><div class="stat-label">Upcoming Deadlines</div></div>
                             </div>
                         </div>
                     </div>
@@ -138,7 +139,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-orange-soft"><i class="bi bi-people text-warning"></i></div>
-                                <div><div class="stat-value"><?php echo $totalUsers; ?></div><div class="stat-label">Total Users</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $totalUsers; ?>"><?php echo $totalUsers; ?></div><div class="stat-label">Total Users</div></div>
                             </div>
                         </div>
                     </div>
@@ -148,25 +149,25 @@ include BASE_PATH . '/includes/header.php';
                     <div class="col-lg-6">
                         <div class="card h-100">
                             <div class="card-header">Scholarships by Type</div>
-                            <div class="card-body"><canvas id="chartType" height="240"></canvas></div>
+                            <div class="card-body" style="height:260px;"><canvas id="chartType"></canvas></div>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="card h-100">
                             <div class="card-header">Applications by Status</div>
-                            <div class="card-body"><canvas id="chartStatus" height="240"></canvas></div>
+                            <div class="card-body" style="height:260px;"><canvas id="chartStatus"></canvas></div>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="card h-100">
                             <div class="card-header">Scholarships by Education Level</div>
-                            <div class="card-body"><canvas id="chartLevel" height="240"></canvas></div>
+                            <div class="card-body" style="height:260px;"><canvas id="chartLevel"></canvas></div>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="card h-100">
                             <div class="card-header">Scholarship Submissions by Month</div>
-                            <div class="card-body"><canvas id="chartMonth" height="240"></canvas></div>
+                            <div class="card-body" style="height:260px;"><canvas id="chartMonth"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -189,10 +190,11 @@ document.addEventListener('DOMContentLoaded', function () {
             type: 'bar',
             data: {
                 labels: data.labels,
-                datasets: [{ label: label, data: data.data, backgroundColor: '#2563eb', borderRadius: 6 }]
+                datasets: [{ label: label, data: data.data, backgroundColor: '#2563eb', hoverBackgroundColor: '#1e4fc2', borderRadius: 8 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
             }
@@ -206,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function () {
             type: 'pie',
             data: {
                 labels: data.labels,
-                datasets: [{ data: data.data, backgroundColor: data.labels.map((_, i) => palette[i % palette.length]) }]
+                datasets: [{ data: data.data, backgroundColor: data.labels.map((_, i) => palette[i % palette.length]), borderWidth: 2, borderColor: '#fff' }]
             },
-            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
     }
 

@@ -9,22 +9,22 @@
  *   $page_active : string
  */
 ?>
-<nav class="navbar navbar-expand-lg navbar-dark edu-navbar sticky-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark edu-navbar sticky-top shadow-sm" id="eduNavbar" aria-label="Main navigation">
     <div class="container-fluid px-3 px-lg-4">
         <a class="navbar-brand fw-bold" href="<?php echo url('index.php'); ?>">
             <i class="bi bi-mortarboard-fill me-1"></i><?php echo e(APP_NAME); ?>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#eduNavbar"
-                aria-controls="eduNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#eduNavbarCollapse"
+                aria-controls="eduNavbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="eduNavbar">
+        <div class="collapse navbar-collapse" id="eduNavbarCollapse">
             <?php if (!$currentUser): ?>
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item"><a class="nav-link <?php echo $page_active === 'home' ? 'active' : ''; ?>" href="<?php echo url('index.php'); ?>">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo url('index.php#scholarships'); ?>">Scholarships</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo url('index.php#how'); ?>">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo url('index.php#faq'); ?>">FAQ</a></li>
                     <li class="nav-item ms-lg-2"><a class="btn btn-outline-light btn-sm px-3 me-lg-2" href="<?php echo url('login.php'); ?>">Log In</a></li>
                     <li class="nav-item"><a class="btn btn-accent btn-sm px-3" href="<?php echo url('register.php'); ?>">Get Started</a></li>
                 </ul>
@@ -47,7 +47,7 @@
 
                     <li class="nav-item ms-lg-2">
                         <div class="dropdown">
-                            <button class="btn btn-icon dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-icon dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
                                 <i class="bi bi-bell"></i>
                                 <?php if ($notifCount > 0): ?><span class="notif-badge"><?php echo $notifCount; ?></span><?php endif; ?>
                             </button>
@@ -84,7 +84,7 @@
 
                     <li class="nav-item ms-lg-2">
                         <div class="dropdown">
-                            <button class="btn btn-outline-light btn-sm dropdown-toggle user-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle user-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
                                 <i class="bi bi-person-circle me-1"></i><?php echo e($currentUser['name']); ?>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">

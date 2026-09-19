@@ -16,6 +16,10 @@ $user = getCurrentUser();
 $me   = getStudentProfileByUserId($user['id']);
 $pdo  = db();
 
+// Auto-expire past-deadline scholarships so students never see stale listings
+// (same controlled maintenance as admin dashboard, safe to run on read).
+expirePastDeadlineScholarships();
+
 // ---- Handle save / unsave ----
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrf('student/scholarships.php');
@@ -106,10 +110,14 @@ if ($page > $pages) {
     $offset = ($page - 1) * $limit;
 }
 
+$studentId = (int)($me['id'] ?? 0);
+$limit = (int)$limit;
+$offset = (int)$offset;
+
 $sql = "SELECT s.*, p.organization_name,
         EXISTS(
             SELECT 1 FROM saved_scholarships ss
-            WHERE ss.student_id = {$me['id']} AND ss.scholarship_id = s.id
+            WHERE ss.student_id = ? AND ss.scholarship_id = s.id
         ) AS is_saved
         FROM scholarships s
         JOIN provider_profiles p ON p.id = s.provider_id
@@ -118,7 +126,7 @@ $sql = "SELECT s.*, p.organization_name,
         LIMIT $limit OFFSET $offset";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute($params);
+$stmt->execute(array_merge([$studentId], $params));
 $scholarships = $stmt->fetchAll();
 
 // Filter options (distinct values from DB)

@@ -92,15 +92,12 @@ function attemptLogin(string $email, string $password): array
 {
     $pdo = db();
 
-    // Gigamitan og TRIM() ang email aron mapapas ang bisan unsang hidden spaces sa database
-    $stmt = $pdo->prepare('SELECT id, name, email, password, TRIM(role) as role, TRIM(status) as status FROM users WHERE TRIM(email) = ?');
-    $stmt->execute([trim($email)]);
+    $email = trim($email);
+    $stmt = $pdo->prepare('SELECT id, name, email, password, TRIM(role) as role, TRIM(status) as status FROM users WHERE email = ?');
+    $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // Gilimpyohan ang password string gikan sa database para sigurado ang password_verify
-    $db_password = isset($user['password']) ? trim($user['password']) : '';
-
-    if (!$user || !password_verify($password, $db_password)) {
+    if (!$user || !password_verify($password, $user['password'])) {
         return ['success' => false, 'message' => 'Invalid email or password.', 'redirect' => ''];
     }
 
@@ -119,6 +116,7 @@ function attemptLogin(string $email, string $password): array
     $_SESSION['user_name']  = $user['name'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_role']  = $user['role'];
+    $_SESSION['last_activity'] = time();
 
     logActivity((int)$user['id'], 'Login', 'User logged in.');
 

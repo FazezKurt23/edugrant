@@ -12,6 +12,12 @@ $user = getCurrentUser();
 $me   = getStudentProfileByUserId($user['id']);
 $pdo  = db();
 
+// Helper to retain submitted values after a validation error, so the user
+// doesn't lose what they typed ("putol"/disappearing input).
+$val = function (string $key) use ($me) {
+    return ($_POST[$key] ?? '') !== '' ? $_POST[$key] : ($me[$key] ?? '');
+};
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrf('student/profile.php');
     $action = $_POST['action'] ?? '';
@@ -44,11 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($birth !== '' && !strtotime($birth)) {
             $errors[] = 'Birth date is invalid.';
         }
-        if ($gpa !== '' && (!is_numeric($gpa) || (float)$gpa < 1.0 || (float)$gpa > 5.0)) {
-            $errors[] = 'GPA must be a number between 1.00 and 5.00.';
+        // Normalize numeric fields: strip commas, peso sign, and spaces so
+        // values like "250,000" or "₱250000" are accepted as numbers.
+        $gpaClean    = normalizeNumeric($gpa);
+        $incomeClean = normalizeNumeric($income);
+
+        if ($gpa !== '' && (!is_numeric($gpaClean) || (float)$gpaClean < 0 || (float)$gpaClean > 100)) {
+            $errors[] = 'GPA must be a valid number (e.g. 1.75, 3.5, or 90).';
         }
-        if ($income !== '' && !is_numeric($income)) {
-            $errors[] = 'Family income must be a number.';
+        if ($income !== '' && !is_numeric($incomeClean)) {
+            $errors[] = 'Family income must be a valid number (e.g. 250000 or 250,000).';
         }
         if ($gender !== '' && !in_array($gender, ['male', 'female', 'other'], true)) {
             $errors[] = 'Gender is invalid.';
@@ -79,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $birth !== '' ? $birth : null, $gender !== '' ? $gender : null,
                 $school, $course, $yearLevel, $academicLevel,
                 $address, $city, $province, $contact,
-                $gpa !== '' ? $gpa : null, $income !== '' ? $income : null,
+                $gpa !== '' ? $gpaClean : null, $income !== '' ? $incomeClean : null,
                 $me['id'],
             ]);
 
@@ -142,39 +153,39 @@ include BASE_PATH . '/includes/header.php';
                                     <div class="row g-3">
                                         <div class="col-md-4">
                                             <label class="form-label required">First name</label>
-                                            <input type="text" class="form-control" name="first_name" value="<?php echo e($me['first_name']); ?>" required>
+                                            <input type="text" class="form-control" name="first_name" value="<?php echo e($val('first_name')); ?>" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Middle name</label>
-                                            <input type="text" class="form-control" name="middle_name" value="<?php echo e($me['middle_name']); ?>">
+                                            <input type="text" class="form-control" name="middle_name" value="<?php echo e($val('middle_name')); ?>">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label required">Last name</label>
-                                            <input type="text" class="form-control" name="last_name" value="<?php echo e($me['last_name']); ?>" required>
+                                            <input type="text" class="form-control" name="last_name" value="<?php echo e($val('last_name')); ?>" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label required">Student ID</label>
-                                            <input type="text" class="form-control" name="student_id" value="<?php echo e($me['student_id']); ?>" required>
+                                            <input type="text" class="form-control" name="student_id" value="<?php echo e($val('student_id')); ?>" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Birth date</label>
-                                            <input type="date" class="form-control" name="birth_date" value="<?php echo e($me['birth_date']); ?>">
+                                            <input type="date" class="form-control" name="birth_date" value="<?php echo e($val('birth_date')); ?>">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Gender</label>
                                             <select class="form-select" name="gender">
                                                 <option value="">Select</option>
-                                                <option value="male" <?php echo $me['gender'] === 'male' ? 'selected' : ''; ?>>Male</option>
-                                                <option value="female" <?php echo $me['gender'] === 'female' ? 'selected' : ''; ?>>Female</option>
-                                                <option value="other" <?php echo $me['gender'] === 'other' ? 'selected' : ''; ?>>Other</option>
+                                                <option value="male" <?php echo $val('gender') === 'male' ? 'selected' : ''; ?>>Male</option>
+                                                <option value="female" <?php echo $val('gender') === 'female' ? 'selected' : ''; ?>>Female</option>
+                                                <option value="other" <?php echo $val('gender') === 'other' ? 'selected' : ''; ?>>Other</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label required">Academic Level</label>
                                             <select class="form-select" id="academic_level" name="academic_level" required>
                                                 <option value="">Select</option>
-                                                <option value="SHS" <?php echo $me['academic_level'] === 'SHS' ? 'selected' : ''; ?>>Senior High School</option>
-                                                <option value="College" <?php echo $me['academic_level'] === 'College' ? 'selected' : ''; ?>>College</option>
+                                                <option value="SHS" <?php echo $val('academic_level') === 'SHS' ? 'selected' : ''; ?>>Senior High School</option>
+                                                <option value="College" <?php echo $val('academic_level') === 'College' ? 'selected' : ''; ?>>College</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -182,41 +193,41 @@ include BASE_PATH . '/includes/header.php';
                                             <select class="form-select" id="year_level" name="year_level" required>
                                                 <option value="">Select</option>
                                                 <?php foreach (['Grade 11', 'Grade 12', '1st Year', '2nd Year', '3rd Year', '4th Year'] as $y): ?>
-                                                    <option <?php echo $me['year_level'] === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                                                    <option <?php echo $val('year_level') === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">School</label>
-                                            <input type="text" class="form-control" name="school" value="<?php echo e($me['school']); ?>">
+                                            <input type="text" class="form-control" name="school" value="<?php echo e($val('school')); ?>">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Strand / Course / Program</label>
-                                            <input type="text" class="form-control" name="course" value="<?php echo e($me['course']); ?>" placeholder="e.g. STEM / BS Information Technology">
+                                            <input type="text" class="form-control" name="course" value="<?php echo e($val('course')); ?>" placeholder="e.g. STEM / BS Information Technology">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">GPA</label>
-                                            <input type="text" class="form-control" name="gpa" value="<?php echo e($me['gpa']); ?>" placeholder="e.g. 1.75">
+                                            <input type="text" class="form-control" name="gpa" value="<?php echo e($val('gpa')); ?>" placeholder="e.g. 1.75">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Family income (PHP)</label>
-                                            <input type="text" class="form-control" name="family_income" value="<?php echo e($me['family_income']); ?>">
+                                            <input type="text" class="form-control" name="family_income" value="<?php echo e($val('family_income')); ?>">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Contact number</label>
-                                            <input type="text" class="form-control" name="contact_number" value="<?php echo e($me['contact_number']); ?>">
+                                            <input type="text" class="form-control" name="contact_number" value="<?php echo e($val('contact_number')); ?>">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Address</label>
-                                            <input type="text" class="form-control" name="address" value="<?php echo e($me['address']); ?>">
+                                            <input type="text" class="form-control" name="address" value="<?php echo e($val('address')); ?>">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">City</label>
-                                            <input type="text" class="form-control" name="city" value="<?php echo e($me['city']); ?>">
+                                            <input type="text" class="form-control" name="city" value="<?php echo e($val('city')); ?>">
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Province</label>
-                                            <input type="text" class="form-control" name="province" value="<?php echo e($me['province']); ?>">
+                                            <input type="text" class="form-control" name="province" value="<?php echo e($val('province')); ?>">
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary-soft mt-4"><i class="bi bi-save me-1"></i>Save Changes</button>

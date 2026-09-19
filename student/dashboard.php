@@ -88,18 +88,41 @@ include BASE_PATH . '/includes/header.php';
         <?php include BASE_PATH . '/includes/sidebar.php'; ?>
         <div class="flex-grow-1 dashboard-content">
             <div class="px-3 px-lg-4">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-                    <div>
-                        <h4 class="fw-bold text-navy mb-0">
-                            Welcome back, <?php echo e($user['name']); ?>!
-                        </h4>
-                        <div class="text-muted">
-                            <?php echo e($me['school'] ?? '—'); ?> · <?php echo e($me['course'] ?? '—'); ?> · <?php echo e($me['year_level'] ?? ''); ?>
+                <!-- Welcome banner -->
+                <div class="welcome-banner mb-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h4 class="mb-1">Welcome back, <?php echo e($user['name']); ?>! 👋</h4>
+                            <p><i class="bi bi-building me-1"></i><?php echo e($me['school'] ?? '—'); ?> · <?php echo e($me['course'] ?? '—'); ?> · <?php echo e($me['year_level'] ?? ''); ?></p>
                         </div>
+                        <a class="btn btn-accent" href="<?php echo url('student/scholarships.php'); ?>">
+                            <i class="bi bi-search me-1"></i> Browse Scholarships
+                        </a>
                     </div>
-                    <a class="btn btn-primary-soft" href="<?php echo url('student/scholarships.php'); ?>">
-                        <i class="bi bi-search me-1"></i> Browse Scholarships
-                    </a>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <a class="quick-action w-100" href="<?php echo url('student/scholarships.php'); ?>">
+                            <span class="stat-icon bg-blue-soft"><i class="bi bi-search"></i></span> Find Scholarships
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a class="quick-action w-100" href="<?php echo url('student/saved-scholarships.php'); ?>">
+                            <span class="stat-icon bg-purple-soft"><i class="bi bi-bookmark-heart"></i></span> My Saved
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a class="quick-action w-100" href="<?php echo url('student/applications.php'); ?>">
+                            <span class="stat-icon bg-green-soft"><i class="bi bi-kanban"></i></span> Applications
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a class="quick-action w-100" href="<?php echo url('student/profile.php'); ?>">
+                            <span class="stat-icon bg-orange-soft"><i class="bi bi-person-gear"></i></span> My Profile
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Stat cards -->
@@ -109,7 +132,7 @@ include BASE_PATH . '/includes/header.php';
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-blue-soft"><i class="bi bi-bookmark-heart text-primary"></i></div>
                                 <div>
-                                    <div class="stat-value"><?php echo $savedCount; ?></div>
+                                    <div class="stat-value" data-count="<?php echo $savedCount; ?>"><?php echo $savedCount; ?></div>
                                     <div class="stat-label">Saved Scholarships</div>
                                 </div>
                             </div>
@@ -120,7 +143,7 @@ include BASE_PATH . '/includes/header.php';
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-green-soft"><i class="bi bi-kanban text-success"></i></div>
                                 <div>
-                                    <div class="stat-value"><?php echo $appCount; ?></div>
+                                    <div class="stat-value" data-count="<?php echo $appCount; ?>"><?php echo $appCount; ?></div>
                                     <div class="stat-label">Active Applications</div>
                                 </div>
                             </div>
@@ -131,7 +154,7 @@ include BASE_PATH . '/includes/header.php';
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-orange-soft"><i class="bi bi-alarm text-warning"></i></div>
                                 <div>
-                                    <div class="stat-value"><?php echo $upcomingCount; ?></div>
+                                    <div class="stat-value" data-count="<?php echo $upcomingCount; ?>"><?php echo $upcomingCount; ?></div>
                                     <div class="stat-label">Upcoming Deadlines</div>
                                 </div>
                             </div>
@@ -142,7 +165,7 @@ include BASE_PATH . '/includes/header.php';
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-purple-soft"><i class="bi bi-star text-primary"></i></div>
                                 <div>
-                                    <div class="stat-value"><?php echo count($recommended); ?></div>
+                                    <div class="stat-value" data-count="<?php echo count($recommended); ?>"><?php echo count($recommended); ?></div>
                                     <div class="stat-label">Recommended</div>
                                 </div>
                             </div>

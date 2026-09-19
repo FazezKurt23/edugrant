@@ -34,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter a valid email address.';
     } elseif (strlen($password) < 8) {
         $error = 'Password must be at least 8 characters long.';
+    } elseif (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+        $error = 'Password must include an uppercase letter, a lowercase letter, and a number.';
     } elseif ($password !== $confirm) {
         $error = 'Passwords do not match.';
     } elseif ($role === 'student' && clean($_POST['student_id'] ?? '') === '') {
@@ -98,8 +100,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pp->execute([$userId, $org, '', $contactP, $contactN, $address, $website]);
                     createNotification($userId, 'Account created',
                         'Your provider account has been created. Await administrator verification.', 'system');
-                    createNotification(1, 'New provider registered',
-                        $org . ' registered and is awaiting verification.', 'system');
+                    // Notify all active admins instead of assuming admin id = 1.
+                    try {
+                        $adminStmt = $pdo->query("SELECT id FROM users WHERE role = 'admin' AND status = 'active'");
+                        foreach ($adminStmt->fetchAll(PDO::FETCH_COLUMN) as $adminId) {
+                            createNotification((int)$adminId, 'New provider registered',
+                                $org . ' registered and is awaiting verification.', 'system');
+                        }
+                    } catch (Throwable $e) {
+                        error_log('Notify admins error: ' . $e->getMessage());
+                    }
                 }
 
                 logActivity($userId, 'Registration', ucfirst($role) . ' account created.');
@@ -123,7 +133,7 @@ include BASE_PATH . '/includes/header.php';
 ?>
 
 <div class="container">
-    <div class="auth-card card">
+    <div class="auth-card auth-card-wide card">
         <div class="card-body p-4 p-md-5">
             <div class="text-center mb-4">
                 <h1 class="h3 fw-bold text-navy mb-1">Create Your <?php echo e(APP_NAME); ?> Account</h1>
@@ -162,13 +172,27 @@ include BASE_PATH . '/includes/header.php';
                     </div>
                     <div class="col-md-6">
                         <label for="password" class="form-label required">Password</label>
-                        <input type="password" class="form-control" id="password" name="password"
-                               minlength="8" required>
+                        <div class="password-wrap">
+                            <input type="password" class="form-control" id="password" name="password"
+                                   minlength="8" required autocomplete="new-password" data-strength>
+                            <button type="button" class="password-toggle" data-target="password" aria-label="Show password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                         <div class="form-text">At least 8 characters.</div>
+                        <div class="password-strength weak" id="passwordStrength" aria-live="polite">
+                            <span class="ps-bar"></span><span class="ps-bar"></span><span class="ps-bar"></span><span class="ps-bar"></span><span class="ps-bar"></span>
+                            <span class="password-hint d-block w-100"></span>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label for="password_confirm" class="form-label required">Confirm password</label>
-                        <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                        <div class="password-wrap">
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required autocomplete="new-password">
+                            <button type="button" class="password-toggle" data-target="password_confirm" aria-label="Show password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Student-only fields -->

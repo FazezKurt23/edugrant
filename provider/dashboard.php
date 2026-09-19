@@ -79,12 +79,24 @@ include BASE_PATH . '/includes/header.php';
                     </div>
                 </div>
 
+                <?php if ($me['verification_status'] === 'pending'): ?>
+                    <div class="alert alert-warning d-flex align-items-center gap-2 py-2">
+                        <i class="bi bi-hourglass-split"></i>
+                        <div>Your organization is pending verification. Scholarships will become visible to students after an administrator approves your listing.</div>
+                    </div>
+                <?php elseif ($me['verification_status'] === 'rejected'): ?>
+                    <div class="alert alert-danger d-flex align-items-center gap-2 py-2">
+                        <i class="bi bi-x-circle"></i>
+                        <div>Your organization verification was rejected. Please update your profile or contact the administrator.</div>
+                    </div>
+                <?php endif; ?>
+
                 <div class="row g-3 mb-4">
                     <div class="col-6 col-lg-3">
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-blue-soft"><i class="bi bi-collection text-primary"></i></div>
-                                <div><div class="stat-value"><?php echo $total; ?></div><div class="stat-label">Total Scholarships</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $total; ?>"><?php echo $total; ?></div><div class="stat-label">Total Scholarships</div></div>
                             </div>
                         </div>
                     </div>
@@ -92,7 +104,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-green-soft"><i class="bi bi-check-circle text-success"></i></div>
-                                <div><div class="stat-value"><?php echo $approved; ?></div><div class="stat-label">Approved</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $approved; ?>"><?php echo $approved; ?></div><div class="stat-label">Approved</div></div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +112,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-orange-soft"><i class="bi bi-hourglass-split text-warning"></i></div>
-                                <div><div class="stat-value"><?php echo $pending; ?></div><div class="stat-label">Pending</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $pending; ?>"><?php echo $pending; ?></div><div class="stat-label">Pending</div></div>
                             </div>
                         </div>
                     </div>
@@ -108,7 +120,7 @@ include BASE_PATH . '/includes/header.php';
                         <div class="card stat-card p-3 h-100">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="stat-icon bg-red-soft"><i class="bi bi-x-circle text-danger"></i></div>
-                                <div><div class="stat-value"><?php echo $rejected; ?></div><div class="stat-label">Rejected</div></div>
+                                <div><div class="stat-value" data-count="<?php echo $rejected; ?>"><?php echo $rejected; ?></div><div class="stat-label">Rejected</div></div>
                             </div>
                         </div>
                     </div>

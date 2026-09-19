@@ -18,10 +18,13 @@ $userId = null;
 
 function validateResetToken(PDO $pdo, string $token, string $email): ?int
 {
+    if ($token === '' || $email === '') {
+        return null;
+    }
     $stmt = $pdo->prepare('SELECT * FROM password_resets WHERE token_hash = ? ORDER BY id DESC LIMIT 1');
     $stmt->execute([hash('sha256', $token)]);
     $row = $stmt->fetch();
-    if (!$row || $row['used']) {
+    if (!$row || (int)($row['used'] ?? 0) === 1) {
         return null;
     }
     if (strtotime($row['expires_at']) < time()) {
@@ -45,7 +48,7 @@ if ($token === '' || $email === '') {
 }
 
 if ($valid && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    requireCsrf('forgot-password.php');
+    requireCsrf('reset-password.php?token=' . urlencode($token) . '&email=' . urlencode($email));
     $pdo = db();
 
     $newPass  = (string)($_POST['new_password'] ?? '');
@@ -53,6 +56,8 @@ if ($valid && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (strlen($newPass) < 8) {
         $error = 'New password must be at least 8 characters long.';
+    } elseif (!preg_match('/[A-Z]/', $newPass) || !preg_match('/[a-z]/', $newPass) || !preg_match('/[0-9]/', $newPass)) {
+        $error = 'New password must include an uppercase letter, a lowercase letter, and a number.';
     } elseif ($newPass !== $confirm) {
         $error = 'Passwords do not match.';
     } else {
@@ -62,8 +67,9 @@ if ($valid && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $up = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
             $up->execute([$hash, $userId]);
 
-            $use = $pdo->prepare('UPDATE password_resets SET used = 1 WHERE user_id = ?');
-            $use->execute([$userId]);
+            // Invalidate only the token that was used, not all tokens of the user.
+            $use = $pdo->prepare('UPDATE password_resets SET used = 1 WHERE token_hash = ?');
+            $use->execute([hash('sha256', $token)]);
 
             $pdo->commit();
         } catch (Throwable $e) {

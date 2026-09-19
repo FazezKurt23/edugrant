@@ -42,14 +42,17 @@ include BASE_PATH . '/includes/header.php';
 
 <!-- ================= HERO ================= -->
 <section class="hero-section">
+    <div class="hero-shape hs-1"></div>
+    <div class="hero-shape hs-2"></div>
+    <div class="hero-shape hs-3"></div>
     <div class="container position-relative">
-        <span class="hero-badge"><i class="bi bi-stars me-1"></i>BSIT Capstone Demo — <?php echo e(APP_NAME); ?></span>
+        <span class="hero-badge"><i class="bi bi-stars me-1"></i> <?php echo e(APP_NAME); ?></span>
         <h1>Discover Scholarships That Match Your Future</h1>
         <p class="lead mt-3">
             <?php echo e(APP_TAGLINE); ?> EduGrant helps students discover scholarship opportunities,
             understand eligibility requirements, track applications, and stay informed about important deadlines.
         </p>
-        <div class="mt-4 d-flex flex-wrap gap-2">
+        <div class="hero-cta mt-4 d-flex flex-wrap gap-2">
             <?php if (isLoggedIn()): ?>
                 <a class="btn btn-accent btn-lg px-4" href="<?php echo url(getCurrentUser()['role'] . '/dashboard.php'); ?>">
                     <i class="bi bi-speedometer2 me-1"></i> Go to Dashboard
@@ -63,10 +66,22 @@ include BASE_PATH . '/includes/header.php';
                 </a>
             <?php endif; ?>
         </div>
-        <div class="hero-stats">
-            <div><div class="num"><?php echo $totalScholarships; ?></div><div class="lbl">Active Scholarships</div></div>
-            <div><div class="num"><?php echo $totalStudents; ?></div><div class="lbl">Student Users</div></div>
-            <div><div class="num"><?php echo $totalProviders; ?></div><div class="lbl">Partner Providers</div></div>
+        <div class="hero-stats mt-4">
+            <div class="hero-stat"><div class="num" data-count="<?php echo $totalScholarships; ?>"><?php echo $totalScholarships; ?></div><div class="lbl">Active Scholarships</div></div>
+            <div class="hero-stat"><div class="num" data-count="<?php echo $totalStudents; ?>"><?php echo $totalStudents; ?></div><div class="lbl">Student Users</div></div>
+            <div class="hero-stat"><div class="num" data-count="<?php echo $totalProviders; ?>"><?php echo $totalProviders; ?></div><div class="lbl">Partner Providers</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= TRUST BAR ================= -->
+<section class="py-4" style="background:#fff; border-bottom:1px solid var(--edu-border);">
+    <div class="container">
+        <div class="trust-bar">
+            <div class="trust-item"><i class="bi bi-shield-check"></i> Secure, role-based access</div>
+            <div class="trust-item"><i class="bi bi-search-heart"></i> Interest-based discovery</div>
+            <div class="trust-item"><i class="bi bi-alarm"></i> Automatic deadline reminders</div>
+            <div class="trust-item"><i class="bi bi-patch-check"></i> Verified provider listings</div>
         </div>
     </div>
 </section>
@@ -75,46 +90,46 @@ include BASE_PATH . '/includes/header.php';
 <section id="why" class="py-5">
     <div class="container">
         <div class="text-center mb-4">
-            <h2 class="section-title">Why <?php echo e(APP_NAME); ?>?</h2>
+            <h2 class="section-title grad-underline">Why <?php echo e(APP_NAME); ?>?</h2>
             <p class="section-sub">Everything a student needs to find and manage scholarship opportunities.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-blue-soft"><i class="bi bi-search text-primary"></i></div>
                     <h5 class="fw-bold">Smart Scholarship Search</h5>
                     <p class="text-muted mb-0">Search and filter real scholarship listings by type, education level, location, and deadline.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-green-soft"><i class="bi bi-clipboard-check text-success"></i></div>
                     <h5 class="fw-bold">Eligibility Guidance</h5>
                     <p class="text-muted mb-0">An honest eligibility guide that compares your profile with each scholarship&rsquo;s requirements.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-orange-soft"><i class="bi bi-alarm text-warning"></i></div>
                     <h5 class="fw-bold">Deadline Monitoring</h5>
                     <p class="text-muted mb-0">Track every deadline with automatic countdowns and reminder notifications.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-purple-soft"><i class="bi bi-kanban text-primary"></i></div>
                     <h5 class="fw-bold">Application Tracking</h5>
                     <p class="text-muted mb-0">Record your progress from interested to applied to under review — all in one place.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-blue-soft"><i class="bi bi-bookmark-heart text-primary"></i></div>
                     <h5 class="fw-bold">Saved Opportunities</h5>
                     <p class="text-muted mb-0">Bookmark scholarships you like and revisit them whenever you are ready.</p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 reveal">
                 <div class="card feature-card p-4">
                     <div class="feature-icon bg-green-soft"><i class="bi bi-shield-check text-success"></i></div>
                     <h5 class="fw-bold">Secure &amp; Simple</h5>
@@ -230,6 +245,120 @@ include BASE_PATH . '/includes/header.php';
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+</section>
+
+<!-- ================= TESTIMONIALS ================= -->
+<section id="testimonials" class="py-5" style="background:#fff;">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="section-title">What Students Say</h2>
+            <p class="section-sub">Real journeys made simpler with <?php echo e(APP_NAME); ?>.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 reveal">
+                <div class="testimonial-card">
+                    <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                    <p class="quote mb-3">&ldquo;I found scholarships I never knew existed. The deadline countdowns kept me on track throughout my senior year.&rdquo;</p>
+                    <div class="person"><i class="bi bi-person-circle me-1"></i>Juan Dela Cruz</div>
+                    <div class="small text-muted">BSIT Student · 4th Year</div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="testimonial-card">
+                    <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></div>
+                    <p class="quote mb-3">&ldquo;The eligibility guide is super helpful. I could quickly tell which scholarships matched my course and GPA.&rdquo;</p>
+                    <div class="person"><i class="bi bi-person-circle me-1"></i>Maria Santos</div>
+                    <div class="small text-muted">Senior High School · Grade 12</div>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="testimonial-card">
+                    <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                    <p class="quote mb-3">&ldquo;As a provider, approving and managing my listings is effortless. The verification process adds real trust.&rdquo;</p>
+                    <div class="person"><i class="bi bi-building me-1"></i>EduFund Foundation</div>
+                    <div class="small text-muted">Scholarship Provider</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq" class="py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-sub">Quick answers to common questions about <?php echo e(APP_NAME); ?>.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="faq-card">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item border-0">
+                            <h3 class="accordion-header" id="faqH1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqC1" aria-expanded="true" aria-controls="faqC1">
+                                    Does EduGrant submit my scholarship applications for me?
+                                </button>
+                            </h3>
+                            <div id="faqC1" class="accordion-collapse collapse show" aria-labelledby="faqH1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    No. EduGrant is an information and tracking system. You are redirected to each provider's official application website to apply.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0">
+                            <h3 class="accordion-header" id="faqH2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqC2" aria-expanded="false" aria-controls="faqC2">
+                                    Is my account free?
+                                </button>
+                            </h3>
+                            <div id="faqC2" class="accordion-collapse collapse" aria-labelledby="faqH2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Yes. Creating a student or provider account is completely free. This is a capstone demo application.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0">
+                            <h3 class="accordion-header" id="faqH3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqC3" aria-expanded="false" aria-controls="faqC3">
+                                    How does the eligibility checker work?
+                                </button>
+                            </h3>
+                            <div id="faqC3" class="accordion-collapse collapse" aria-labelledby="faqH3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    It compares your profile (course, GPA, income) with each scholarship's structured requirements. Items that can't be verified show as &ldquo;Requires Manual Review.&rdquo; It's a guide only.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0">
+                            <h3 class="accordion-header" id="faqH4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqC4" aria-expanded="false" aria-controls="faqC4">
+                                    How do I get notified about deadlines?
+                                </button>
+                            </h3>
+                            <div id="faqC4" class="accordion-collapse collapse" aria-labelledby="faqH4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    EduGrant automatically generates deadline reminders for your saved scholarships. You'll see them in your notifications when you open your dashboard.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item border-0">
+                            <h3 class="accordion-header" id="faqH5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqC5" aria-expanded="false" aria-controls="faqC5">
+                                    Can providers publish scholarships directly?
+                                </button>
+                            </h3>
+                            <div id="faqC5" class="accordion-collapse collapse" aria-labelledby="faqH5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Providers create scholarships as drafts, then submit them. An administrator reviews and approves each listing before it becomes visible to students.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

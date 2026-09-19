@@ -9,11 +9,7 @@ require_once __DIR__ . '/includes/auth.php';
 // Kon naka-login na, i-redirect sa saktong dashboard
 if (isLoggedIn()) {
     $user = getCurrentUser();
-    if ($user['role'] === 'admin') {
-        redirect('provider/dashboard.php'); // Temporaryo nga ruta sa admin samtang walay admin polder
-    } else {
-        redirect($user['role'] . '/dashboard.php');
-    }
+    redirect($user['role'] . '/dashboard.php');
 }
 
 $error = '';
@@ -69,7 +65,12 @@ include BASE_PATH . '/includes/header.php';
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="password-wrap">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <button type="button" class="password-toggle" data-target="password" aria-label="Show password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <a href="<?php echo url('forgot-password.php'); ?>" class="small">Forgot password?</a>
